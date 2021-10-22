@@ -3,14 +3,79 @@
 
 using namespace std;
 
-class Osoba{
+class Osoby {
 private:
     string imie;
     string nazwisko;
     string PESEL;
+    string adres;
 
+    int size;
+    Osoby **baza;
 
+public:
+    Osoby():
+        imie(""),
+        nazwisko(""),
+        PESEL(""),
+        adres(""),
+        size(0),
+        baza(NULL) {
+
+    }
+
+    ~Osoby() {
+        for(int i = 0; i < size; i++) {
+            Osoby *currOsoba = *(baza + i);
+            if(currOsoba != NULL) {
+                *(baza + i) = NULL;
+                delete currOsoba;
+            }
+        }
+        if(baza != NULL)
+            free(baza);
+    }
+
+    void add(string imie, string nazwisko, string PESEL, string adres);
+    void remove(string PESEL);
+    void display();
 };
+
+void Osoby::display() {
+    puts("");
+    for(int i = 0; i < size; i++) {
+        Osoby *currentNode = *(baza + i);
+
+        if(currentNode != NULL)
+            cout << currentNode->imie << " " << currentNode->nazwisko << ", " << currentNode->adres << ", PESEL: " << currentNode->PESEL << endl;
+    }
+    puts("");
+}
+
+void Osoby::add(string imie, string nazwisko, string PESEL, string adres) {
+    baza = (Osoby**) realloc(baza, sizeof(Osoby*) * (size + 1));
+    size++;
+
+    Osoby *newOsoba = new Osoby();
+    newOsoba->imie = imie;
+    newOsoba->nazwisko = nazwisko;
+    newOsoba->PESEL = PESEL;
+    newOsoba->adres = adres;
+
+    *(baza + size - 1) = newOsoba;
+}
+
+void Osoby::remove(string PESEL) {
+    for(int i = 0; i < size; i++) {
+        Osoby *currOsoba = *(baza + i);
+
+        if(PESEL == currOsoba->PESEL) {
+            *(baza + i) = NULL;
+            delete currOsoba;
+            return;
+        }
+    }
+}
 
 class Lista {
 private:
@@ -273,6 +338,18 @@ int main() {
     lista->display();
 
     delete lista;
+
+    Osoby *osoby = new Osoby();
+
+    osoby->add("Mariusz", "Gruszczynski", "51248753897", "ULICA SIAKA OWAKA");
+    osoby->add("Maciek", "Wisniewski", "21374201234", "ULICA MAKAO");
+    osoby->add("Jacek", "Placek", "14893654791", "ULICA KOPERKOWA");
+    osoby->display();
+
+    osoby->remove("21374201234");
+    osoby->display();
+
+    delete osoby;
 
     return 0;
 }
