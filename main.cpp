@@ -1,355 +1,200 @@
 #include <iostream>
 #include <string>
+#include <stdio.h>
 
 using namespace std;
 
-class Osoby {
+class Klasa {
 private:
-    string imie;
-    string nazwisko;
-    string PESEL;
-    string adres;
-
-    int size;
-    Osoby **baza;
+    int x;
+    int y;
+    int z;
 
 public:
-    Osoby():
-        imie(""),
-        nazwisko(""),
-        PESEL(""),
-        adres(""),
-        size(0),
-        baza(NULL) {
+    Klasa() {
+        setX(0);
+        setY(0);
+        setZ(0);
+        puts("konstruktor domyslny");
+    }
+
+    Klasa(int x) {
+        setX(x);
+        setY(0);
+        setZ(0);
+        printf("konstruktor z jednym argumentem x = %d\n", getX());
+    }
+
+    Klasa(int x, int y) {
+        setX(x);
+        setY(y);
+        setZ(0);
+        printf("konstruktor z dwoma argumentami x = %d y = %d\n", getX(), getY());
+    }
+
+    Klasa(int x, int y, int z) {
+        setX(x);
+        setY(y);
+        setZ(z);
+        printf("konstruktor z trzema argumentami x = %d y = %d z = %d\n", getX(), getY(), getZ());
+    }
+
+    Klasa(const Klasa& k) {
+        puts("konstruktor kopiujacy");
+        setX(k.getX());
+        setY(k.getY());
+        setZ(k.getZ());
+    }
+
+    int getX() const;
+    int getY() const;
+    int getZ() const;
+    void setX(int x);
+    void setY(int y);
+    void setZ(int z);
+};
+
+void Klasa::setX(int x) {
+    this->x = x;
+}
+
+void Klasa::setY(int y) {
+    this->y = y;
+}
+
+void Klasa::setZ(int z) {
+    this->z = z;
+}
+
+
+int Klasa::getX() const {
+    return x;
+}
+
+
+int Klasa::getY() const {
+    return y;
+}
+
+
+int Klasa::getZ() const {
+    return z;
+}
+
+
+class Pkt {
+public:
+    int x;
+    int y;
+
+    Pkt():
+        x(0),
+        y(0) {
 
     }
 
-    ~Osoby() {
-        for(int i = 0; i < size; i++) {
-            Osoby *currOsoba = *(baza + i);
-            if(currOsoba != NULL) {
-                *(baza + i) = NULL;
-                delete currOsoba;
-            }
-        }
-        if(baza != NULL)
-            free(baza);
+    Pkt(int x, int y):
+        x(x),
+        y(y) {
+
     }
 
-    void add(string imie, string nazwisko, string PESEL, string adres);
-    void remove(string PESEL);
+    void set(int x, int y) {
+        this->x = x;
+        this->y = y;
+    }
+};
+
+class Wektor {
+private:
+    static int count;
+
+public:
+    Pkt pocz, kon;
+
+    Wektor() {
+        count++;
+    }
+
+    Wektor(Pkt pocz, Pkt kon):
+        pocz(pocz),
+        kon(kon) {
+        count++;
+    }
+
+    Wektor(int poczX, int poczY, int konX, int konY) {
+        pocz.x = poczX;
+        pocz.y = poczY;
+        kon.x = konX;
+        kon.y = konY;
+        count++;
+    }
+
+    ~Wektor() {
+        puts("zadanie wykonane");
+    }
+
+    void dodaj(const Wektor&);
+    void odejmij(const Wektor&);
+    static int mnozenieSkalarne(const Wektor&, const Wektor&);
+    static int getCount();
     void display();
 };
 
-void Osoby::display() {
-    puts("");
-    for(int i = 0; i < size; i++) {
-        Osoby *currentNode = *(baza + i);
-
-        if(currentNode != NULL)
-            cout << currentNode->imie << " " << currentNode->nazwisko << ", " << currentNode->adres << ", PESEL: " << currentNode->PESEL << endl;
-    }
-    puts("");
+void Wektor::display() {
+    printf("PoczatekX: %d, PoczatekY: %d, KoniecX: %d, KoniecY: %d\n", pocz.x, pocz.y, kon.x, kon.y);
 }
 
-void Osoby::add(string imie, string nazwisko, string PESEL, string adres) {
-    baza = (Osoby**) realloc(baza, sizeof(Osoby*) * (size + 1));
-    size++;
-
-    Osoby *newOsoba = new Osoby();
-    newOsoba->imie = imie;
-    newOsoba->nazwisko = nazwisko;
-    newOsoba->PESEL = PESEL;
-    newOsoba->adres = adres;
-
-    *(baza + size - 1) = newOsoba;
+void Wektor::dodaj(const Wektor& w) {
+    this->pocz.x += w.pocz.x;
+    this->pocz.y += w.pocz.y;
+    this->kon.x += w.kon.x;
+    this->kon.y += w.kon.y;
 }
 
-void Osoby::remove(string PESEL) {
-    for(int i = 0; i < size; i++) {
-        Osoby *currOsoba = *(baza + i);
-
-        if(PESEL == currOsoba->PESEL) {
-            *(baza + i) = NULL;
-            delete currOsoba;
-            return;
-        }
-    }
+void Wektor::odejmij(const Wektor& w) {
+    this->pocz.x -= w.pocz.x;
+    this->pocz.y -= w.pocz.y;
+    this->kon.x -= w.kon.x;
+    this->kon.y -= w.kon.y;
 }
 
-class Lista {
-private:
-    unsigned int ID;
-    Lista *prev;
-    Lista *next;
+int Wektor::mnozenieSkalarne(const Wektor &a, const Wektor &b) {
+    int aDlugoscX = a.kon.x - a.pocz.x;
+    int aDlugoscY = a.kon.y - a.pocz.y;
+    int bDlugoscX = b.kon.x - b.pocz.x;
+    int bDlugoscY = b.kon.y - b.pocz.y;
 
-public:
-    Lista(unsigned int ID):
-        ID(ID),
-        prev(NULL),
-        next(NULL) {
-
-    }
-
-    ~Lista() {
-        printf("deleting node with ID: %d...\n", this->ID);
-
-        if(next)
-            delete next;
-    }
-
-    int add_after(unsigned int, unsigned int); //dodanie elementu za elementem o indeksie arg1, zwraca -1 jesli jest juz element o podanym ID, -2 w razie duplikatu, 0 gdy sukces
-    int remove(unsigned int); //usuwa (i zwraca) element od podanym ID, -1 jesli nie go znajdzie
-    void display();
-    void sort();
-    Lista* get_node(unsigned int); //zwraca element listy o zadanym ID
-
-private:
-    static int swap(Lista*, Lista*); //zwraca -1 w przypadku bledu, 0 jesli sukces
-    static int compare(Lista*, Lista*); //zwraca 0 jesli node'y sa rowne, -1 jesli node1 jest wiekszy, 1 jesli node2 jest wiekszy, -2 jesli ktorys jest NULLem
-};
-
-void Lista::sort() {
-    printf("sorting...\n");
-    int sorted = 0;
-
-    while(sorted == 0) {
-        int swapped = 0;
-
-        Lista* currNode = this;
-        Lista* nextNode = this->next;
-
-        while(nextNode != NULL) {
-            if(compare(currNode, nextNode) == -1) {
-                swap(currNode, nextNode);
-                swapped = 1;
-            }
-
-            currNode = currNode->next;
-            nextNode = nextNode->next;
-
-
-        }
-        if(swapped == 0)
-            sorted = 1;
-    }
+    return aDlugoscX * bDlugoscX + aDlugoscY * bDlugoscY;
 }
 
-int Lista::swap(Lista* node1, Lista* node2) {
-    if(!node1 || !node2)
-        return -1;
-
-    if(node1 == node2)
-        return -1;
-
-    unsigned int tempID = node1->ID;
-    node1->ID = node2->ID;
-    node2->ID = tempID;
-
-    return 0;
+int Wektor::getCount() {
+    return count;
 }
 
-int Lista::compare(Lista* node1, Lista* node2) {
-    if(node1 != NULL && node2 != NULL) {
-        if(node1->ID > node2->ID)
-            return -1;
-        if(node1->ID < node2->ID)
-            return 1;
-        if(node1->ID == node2->ID)
-            return 0;
-    }
-
-    return -2;
-}
-
-int Lista::remove(unsigned int ID) {
-    Lista* found = get_node(ID);
-
-    if(!found)
-        return -1;
-
-    if(found->next)
-        found->next->prev = found->prev;
-    found->prev->next = found->next;
-
-    //NULLowanie zeby nie zniszczyc calej listy zaczynajac od "found"
-    found->prev = NULL;
-    found->next = NULL;
-
-    int value = found->ID;
-
-    delete found;
-
-    return value;
-}
-
-void Lista::display() {
-    Lista* temp = this;
-
-    puts("\ndisplaying list...");
-    do {
-        printf("%d\n", temp->ID);
-        temp = temp->next;
-    } while(temp != NULL);
-
-    puts("");
-}
-
-Lista* Lista::get_node(unsigned int ID) {
-    Lista *temp = this;
-
-    do {
-        if(temp->ID == ID)
-            return temp;
-        temp = temp->next;
-    } while(temp != NULL);
-
-    return NULL;
-}
-
-int Lista::add_after(unsigned int ID, unsigned int newNodeID) {
-    Lista* found = get_node(newNodeID); //ochrona przed duplikatem
-
-    if(found)
-        return -2;
-
-    found = get_node(ID); //sprawdzanie czy jest istnieje z ID = arg1
-
-    if(!found)
-        return -1;
-
-    Lista* newNode = new Lista(newNodeID);
-
-    printf("adding list with ID: %d\n", newNodeID);
-
-    if(found->next != NULL) {
-        found->next->prev = newNode; //kolejnosc jest wazna, nie wyciagam przed nawias
-        newNode->prev = found;
-        newNode->next = found->next;
-        found->next = newNode;
-    } else {
-        found->next = newNode;
-        newNode->prev = found;
-    }
-
-    return 0;
-}
-
-class Zesp {
-public:
-    int real;
-    int imag;
-
-    Zesp():
-        real(1),
-        imag(1) {
-
-    }
-
-    void dodaj(Zesp);
-    void odejmij(Zesp);
-    void pomnoz(Zesp);
-    void podziel(Zesp);
-    void print();
-    void set(int, int);
-};
-
-void Zesp::set(int real, int imag) {
-    this->real = real;
-    this->imag = imag;
-}
-
-void Zesp::print() {
-    printf("%d + %di\n", real, imag);
-}
-
-void Zesp::dodaj(Zesp z) {
-    this->real += z.real;
-    this->imag += z.imag;
-}
-
-void Zesp::odejmij(Zesp z) {
-    this->real -= z.real;
-    this->imag -= z.imag;
-}
-
-void Zesp::pomnoz(Zesp z) {
-    Zesp z3;
-    z3.real = this->real * z.real - this->imag * z.imag;
-    z3.imag = this->real * z.imag + this->imag * z.real;
-    this->real = z3.real;
-    this->imag = z3.imag;
-}
-
-void Zesp::podziel(Zesp z) {
-    Zesp z3;
-    double w = z.real * z.real + z.imag * z.imag;
-
-    if (w > 0) {
-        z3.real = (this->real * z.real + this->imag * z.imag) / w;
-        z3.imag = (z.real * this->imag - this->real * z.imag) / w;
-        this->real = z3.real;
-        this->imag = z3.imag;
-    } else {
-        printf("Blad dzielenia\n");
-    }
-}
+int Wektor::count = 0;
 
 int main() {
-    Zesp z1, z2;
+    Wektor a(2, 1, 3, 4);
+    Wektor b(5, 2, 7, 5);
 
-    z1.print();
-
-    z1.dodaj(z2);
-    z1.print();
-
-    z1.odejmij(z2);
-    z1.print();
-
-    z2.set(4, 7);
-
-    z1.dodaj(z2);
-    z1.print();
-
-    z1.pomnoz(z2);
-    z1.print();
-
-    z1.podziel(z2);
-    z1.print();
-
+    a.display();
+    b.display();
+    a.dodaj(b);
+    a.display();
+    a.odejmij(b);
+    a.display();
+    puts("");
+    printf("mnozenie skalarne: %d\n", Wektor::mnozenieSkalarne(a, b));
+    printf("ile wektorow?: %d\n", Wektor::getCount());
     puts("");
 
-    Lista* lista = new Lista(5);
+    Klasa q, w(4), e(1, 4), r(5, 2, 1);
+    puts("");
 
-    lista->add_after(5, 4);
-    lista->add_after(4, 10);
-    lista->add_after(10, 1);
-    lista->add_after(1, 8);
-    lista->add_after(4, 5); //nie doda sie, bo duplikat
-    lista->add_after(4, 13); //dodawanie w srodek listy
-    lista->display();
-
-    lista->remove(10);
-    lista->remove(8);
-    lista->add_after(4, 18);
-    lista->display();
-
-    lista->sort();
-    lista->display();
-
-    delete lista;
-
-    Osoby *osoby = new Osoby();
-
-    osoby->add("Mariusz", "Gruszczynski", "51248753897", "ULICA SIAKA OWAKA");
-    osoby->add("Maciek", "Wisniewski", "21374201234", "ULICA MAKAO");
-    osoby->add("Jacek", "Placek", "14893654791", "ULICA KOPERKOWA");
-    osoby->display();
-
-    osoby->remove("21374201234");
-    osoby->display();
-
-    delete osoby;
+    Klasa t(r);
+    printf("skopiowana klasa: %d %d %d\n", t.getX(), t.getY(), t.getZ());
+    puts("");
 
     return 0;
 }
