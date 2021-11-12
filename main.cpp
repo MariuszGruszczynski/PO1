@@ -9,18 +9,18 @@ protected:
     string imie;
     string nazwisko;
     string nip;
-    string dataUr;
+    string dataZatr;
     string dzial;
     int pensja;
 
 public:
     Pracownik() = delete;
 
-    Pracownik(string imie, string nazwisko, string nip, string dataUr, string dzial, int pensja):
+    Pracownik(string imie, string nazwisko, string nip, string dataZatr, string dzial, int pensja):
         imie(imie),
         nazwisko(nazwisko),
         nip(nip),
-        dataUr(dataUr),
+        dataZatr(dataZatr),
         dzial(dzial),
         pensja(pensja) {
 
@@ -30,11 +30,11 @@ public:
 
     }
 
-    virtual void display();
+    virtual void infoPracownika();
 };
 
-void Pracownik::display() {
-    cout << imie << " " << nazwisko << " nip: " << nip << " data: " << dataUr << " dzial: " << dzial << " pensja: " << pensja;
+void Pracownik::infoPracownika() {
+    printf("%s %s, nip: %s, data zatrudnienia: %s, pensja: %d, dzial: %s", imie.c_str(), nazwisko.c_str(), nip.c_str(), dataZatr.c_str(), pensja, dzial.c_str());
 }
 
 class Kierownik : public Pracownik {
@@ -46,8 +46,8 @@ protected:
 public:
     Kierownik() = delete;
 
-    Kierownik(string imie, string nazwisko, string nip, string dataUr, string dzial, int pensja, string typKierownictwa, int dodatek, int iloscPodwladnych):
-        Pracownik(imie, nazwisko, nip, dataUr, dzial, pensja),
+    Kierownik(string imie, string nazwisko, string nip, string dataZatr, string dzial, int pensja, string typKierownictwa, int dodatek, int iloscPodwladnych):
+        Pracownik(imie, nazwisko, nip, dataZatr, dzial, pensja),
         typKierownictwa(typKierownictwa),
         dodatek(dodatek),
         iloscPodwladnych(iloscPodwladnych) {
@@ -58,12 +58,20 @@ public:
 
     }
 
-    virtual void display() override;
+    void przyjmijPracownika(string, string, string, string, string, int);
+    virtual void infoPracownika() override;
 };
 
-void Kierownik::display() {
-    Pracownik::display();
-    cout << " typ kierownictwa: " << typKierownictwa << " dodatek: " << dodatek << " ilosc podwladnych: " << iloscPodwladnych;
+void Kierownik::przyjmijPracownika(string imie, string nazwisko, string nip, string dataZatr, string dzial, int pensja){
+    Pracownik nowy(imie,nazwisko,nip,dataZatr,dzial,pensja);
+    puts("przyjeto pracownika:");
+    nowy.infoPracownika();
+}
+
+void Kierownik::infoPracownika() {
+    printf("kierownik: ");
+    Pracownik::infoPracownika();
+    printf(", ilosc podwladnych: %d, dodatek funkcyjny: %d %%, typ kierownictwa: %s", iloscPodwladnych, dodatek, typKierownictwa.c_str());
 }
 
 class Resistor {
