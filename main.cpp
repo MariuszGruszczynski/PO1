@@ -4,75 +4,116 @@
 
 using namespace std;
 
+class Osoba {
+protected:
+    string imie, nazwisko, dataUr;
+
+public:
+    Osoba() = delete;
+
+    Osoba(string imie, string nazwisko, string dataUr):
+        imie(imie),
+        nazwisko(nazwisko),
+        dataUr(dataUr) {
+
+    }
+
+    virtual void wypiszInfo() {
+        printf("%s %s, urodzony/a: %s", imie.c_str(), nazwisko.c_str(), dataUr.c_str());
+    }
+
+    virtual ~Osoba() {
+
+    }
+};
+
+class Student : public Osoba {
+protected:
+    unsigned int rok, grupa, nrIndeksu;
+
+public:
+    Student() = delete;
+
+    Student(string imie, string nazwisko, string dataUr, unsigned int rok, unsigned int grupa, unsigned int nrIndeksu):
+        Osoba(imie, nazwisko, dataUr),
+        rok(rok),
+        grupa(grupa),
+        nrIndeksu(nrIndeksu) {
+
+    }
+
+    virtual void wypiszInfo() {
+        Osoba::wypiszInfo();
+        printf(", student, rok studiow: %d, grupa: %d, numer indeksu: %d\n", rok, grupa, nrIndeksu);
+    }
+};
+
+class Pilkarz : public Osoba {
+protected:
+    string pozycja, klub;
+    unsigned int liczbaGoli;
+public:
+    Pilkarz() = delete;
+
+    Pilkarz(string imie, string nazwisko, string dataUr, string pozycja, string klub):
+        Osoba(imie, nazwisko, dataUr),
+        pozycja(pozycja),
+        klub(klub),
+        liczbaGoli(0) {
+
+    }
+
+    virtual void wypiszInfo() {
+        Osoba::wypiszInfo();
+        printf(", pilkarz, klub: %s, pozycja: %s, liczba goli: %u\n", klub.c_str(), pozycja.c_str(), liczbaGoli);
+    }
+
+    void strzelGola() {
+        liczbaGoli++;
+    }
+};
+
 class Pracownik {
 protected:
-    string imie;
-    string nazwisko;
-    string nip;
-    string dataZatr;
-    string dzial;
+    string imie, nazwisko, nip, dataZatr, dzial;
     int pensja;
 
 public:
-    Pracownik() = delete;
-
-    Pracownik(string imie, string nazwisko, string nip, string dataZatr, string dzial, int pensja):
-        imie(imie),
+    Pracownik(string imie, string nazwisko, string nip, string dataZatr, string dzial, int pensja) : imie(imie),
         nazwisko(nazwisko),
         nip(nip),
         dataZatr(dataZatr),
         dzial(dzial),
         pensja(pensja) {
-
     }
 
-    virtual ~Pracownik() {
-
+    virtual void display() const {
+        printf("%s %s, nip: %s, data zatrudnienia %s, dzial: %s, pensja: %d", imie.c_str(), nazwisko.c_str(), nip.c_str(), dataZatr.c_str(), dzial.c_str(), pensja);
     }
-
-    virtual void infoPracownika();
 };
-
-void Pracownik::infoPracownika() {
-    printf("%s %s, nip: %s, data zatrudnienia: %s, pensja: %d, dzial: %s", imie.c_str(), nazwisko.c_str(), nip.c_str(), dataZatr.c_str(), pensja, dzial.c_str());
-}
 
 class Kierownik : public Pracownik {
 protected:
-    string typKierownictwa;
-    int dodatek; //wyrazony w %
-    int iloscPodwladnych;
+    string typKier;
+    int iloscPodw, dodFunk /*wyrazony w % */;
 
 public:
-    Kierownik() = delete;
-
-    Kierownik(string imie, string nazwisko, string nip, string dataZatr, string dzial, int pensja, string typKierownictwa, int dodatek, int iloscPodwladnych):
-        Pracownik(imie, nazwisko, nip, dataZatr, dzial, pensja),
-        typKierownictwa(typKierownictwa),
-        dodatek(dodatek),
-        iloscPodwladnych(iloscPodwladnych) {
-
+    Kierownik(string imie, string nazwisko, string nip, string dataZatr, string dzial, string typKier, int pensja, int iloscPodw, int dodFunk) : Pracownik(imie, nazwisko, nip, dataZatr, dzial, pensja),
+        typKier(typKier),
+        iloscPodw(iloscPodw),
+        dodFunk(dodFunk) {
     }
 
-    virtual ~Kierownik() {
-
+    virtual void display() const {
+        Pracownik::display();
+        printf(" + dodatek funkcyjny %d%%, typ kierownictwa: %s, ilosc podwladnych: %d", dodFunk, typKier.c_str(), iloscPodw);
     }
 
-    void przyjmijPracownika(string, string, string, string, string, int);
-    virtual void infoPracownika() override;
+    void przyjmijPracownika(const Pracownik &prac) {
+        printf("Przyjeto pracownika! Dane pracownika: ");
+        prac.display();
+    }
 };
-
-void Kierownik::przyjmijPracownika(string imie, string nazwisko, string nip, string dataZatr, string dzial, int pensja){
-    Pracownik nowy(imie,nazwisko,nip,dataZatr,dzial,pensja);
-    puts("przyjeto pracownika:");
-    nowy.infoPracownika();
-}
-
-void Kierownik::infoPracownika() {
-    printf("kierownik: ");
-    Pracownik::infoPracownika();
-    printf(", ilosc podwladnych: %d, dodatek funkcyjny: %d %%, typ kierownictwa: %s", iloscPodwladnych, dodatek, typKierownictwa.c_str());
-}
 
 class Resistor {
     double res;
@@ -122,11 +163,36 @@ ostream& operator<<(ostream& os, const Resistor& res) {
 }
 
 int main() {
+    //zad 1
+    puts("ZADANIE 1 ZADANIE 1 ZADANIE 1 ZADANIE 1 ZADANIE 1");
+    Pracownik prac("Maciej", "Iksinski", "825962398562", "10.10.2020", "marketing", 1800);
+    prac.display();
+
+    puts("\n");
+    Kierownik kier("Filip", "Matusiak", "962598525", "20.09.2018", "marketing", "kierownik marketingu", 2300, 4, 10);
+    kier.display();
+
+    puts("\n");
+    kier.przyjmijPracownika(prac);
+    puts("");
+
     //zad 2
+    puts("\nZADANIE 2 ZADANIE 2 ZADANIE 2 ZADANIE 2 ZADANIE 2");
+    Osoba *student = new Student("Zbigniew", "Mach", "20.10.1998", 3, 2, 214523);
+    Osoba *pilkarz = new Pilkarz("Marcin", "Zuch", "19.11.1996", "obronca", "Pisia Zygry");
 
+    student->wypiszInfo();
+    pilkarz->wypiszInfo();
 
+    Pilkarz *pilkarz_cast = (Pilkarz*) pilkarz;
+    pilkarz_cast->strzelGola();
 
+    pilkarz->wypiszInfo();
+
+    delete student;
+    delete pilkarz;
     //zad 3
+    puts("\n\nZADANIE 3 ZADANIE 3 ZADANIE 3 ZADANIE 3 ZADANIE 3");
     Resistor r1(5), r2(8);
 
     Resistor r3 = r1 + r2;
