@@ -1,228 +1,744 @@
 #include <iostream>
+#include <cstdio>
 #include <string>
-#include <stdio.h>
+#include <cmath>
+#include <bitset>
 
-using namespace std;
+using std::cout;
+using std::cin;
+using std::endl;
+using std::string;
 
-class Osoba {
+char znakSzesnastkowy(int liczba);
+
+class Liczba {
 protected:
-    string imie, nazwisko, dataUr;
-
+    string liczba;
+    class WrongCharacterEntered {} wrongCharacterEntered;
 public:
-    Osoba() = delete;
-
-    Osoba(string imie, string nazwisko, string dataUr):
-        imie(imie),
-        nazwisko(nazwisko),
-        dataUr(dataUr) {
-
+    Liczba() {
+        liczba = "0";
     }
+    virtual ~Liczba() {}
 
-    virtual void wypiszInfo() {
-        printf("%s %s, urodzony/a: %s", imie.c_str(), nazwisko.c_str(), dataUr.c_str());
-    }
+    virtual void wyswietl() = 0;
+    virtual int pobierz() = 0;
 
-    virtual ~Osoba() {
-
-    }
+    friend class LiczbaDwojkowa;
+    friend class LiczbaOsemkowa;
+    friend class LiczbaSzesnastkowa;
 };
 
-class Student : public Osoba {
-protected:
-    unsigned int rok, grupa, nrIndeksu;
-
+class LiczbaDziesietna: public Liczba {
 public:
-    Student() = delete;
+    LiczbaDziesietna() {}
+    virtual ~LiczbaDziesietna() {}
 
-    Student(string imie, string nazwisko, string dataUr, unsigned int rok, unsigned int grupa, unsigned int nrIndeksu):
-        Osoba(imie, nazwisko, dataUr),
-        rok(rok),
-        grupa(grupa),
-        nrIndeksu(nrIndeksu) {
+    virtual void wyswietl();
+    virtual int pobierz();
+    string naDwojkowy();
+    string naOsemkowy();
+    string naSzesnastkowy();
 
-    }
-
-    virtual void wypiszInfo() {
-        Osoba::wypiszInfo();
-        printf(", student, rok studiow: %d, grupa: %d, numer indeksu: %d\n", rok, grupa, nrIndeksu);
-    }
+    static LiczbaDziesietna dodaj(const LiczbaDziesietna& l1, const LiczbaDziesietna& l2);
+    static LiczbaDziesietna odejmij(const LiczbaDziesietna& l1, const LiczbaDziesietna& l2);
+    static LiczbaDziesietna pomnoz(const LiczbaDziesietna& l1, const LiczbaDziesietna& l2);
+    static LiczbaDziesietna podziel(const LiczbaDziesietna& l1, const LiczbaDziesietna& l2);
 };
 
-class Pilkarz : public Osoba {
-protected:
-    string pozycja, klub;
-    unsigned int liczbaGoli;
+class LiczbaDwojkowa: public Liczba {
 public:
-    Pilkarz() = delete;
+    LiczbaDwojkowa() {}
+    virtual ~LiczbaDwojkowa() {}
 
-    Pilkarz(string imie, string nazwisko, string dataUr, string pozycja, string klub):
-        Osoba(imie, nazwisko, dataUr),
-        pozycja(pozycja),
-        klub(klub),
-        liczbaGoli(0) {
+    virtual void wyswietl();
+    virtual int pobierz();
+    string naDziesietny();
+    string naOsemkowy();
+    string naSzesnastkowy();
 
-    }
-
-    virtual void wypiszInfo() {
-        Osoba::wypiszInfo();
-        printf(", pilkarz, klub: %s, pozycja: %s, liczba goli: %u\n", klub.c_str(), pozycja.c_str(), liczbaGoli);
-    }
-
-    void strzelGola() {
-        liczbaGoli++;
-    }
+    static LiczbaDwojkowa dodaj(LiczbaDwojkowa& l1, LiczbaDwojkowa& l2);
+    static LiczbaDwojkowa odejmij(LiczbaDwojkowa& l1, LiczbaDwojkowa& l2);
+    static LiczbaDwojkowa pomnoz(LiczbaDwojkowa& l1, LiczbaDwojkowa& l2);
+    static LiczbaDwojkowa podziel(LiczbaDwojkowa& l1, LiczbaDwojkowa& l2);
 };
 
-class Pracownik {
-protected:
-    string imie, nazwisko, dataZatr, dzial;
-    long long int nip;
-    int pensja;
-
+class LiczbaOsemkowa: public Liczba {
 public:
-    Pracownik(int czyZwyklyPracownik = 1) {
-        if(czyZwyklyPracownik)
-            puts("Dodawanie pracownika...");
-        else
-            puts("Dodawanie kierownika...");
+    LiczbaOsemkowa() {}
+    virtual ~LiczbaOsemkowa() {}
 
-        printf("Imie: ");
-        cin >> imie;
-        printf("Nazwisko: ");
-        cin >> nazwisko;
-        printf("NIP: ");
-        cin >> nip;
-        printf("data zatrudnienia: ");
-        cin >> dataZatr;
-        printf("Dzial: ");
-        cin >> dzial;
-        printf("Pensja: ");
-        cin >> pensja;
-        puts("");
-    }
+    virtual void wyswietl();
+    virtual int pobierz();
+    string naDziesietny();
+    string naDwojkowy();
+    string naSzesnastkowy();
 
-    virtual void display() const {
-        printf("%s %s, nip: %lld, data zatrudnienia %s, dzial: %s, pensja: %d", imie.c_str(), nazwisko.c_str(), nip, dataZatr.c_str(), dzial.c_str(), pensja);
-    }
+    static LiczbaOsemkowa dodaj(LiczbaOsemkowa& l1, LiczbaOsemkowa& l2);
+    static LiczbaOsemkowa odejmij(LiczbaOsemkowa& l1, LiczbaOsemkowa& l2);
+    static LiczbaOsemkowa pomnoz(LiczbaOsemkowa& l1, LiczbaOsemkowa& l2);
+    static LiczbaOsemkowa podziel(LiczbaOsemkowa& l1, LiczbaOsemkowa& l2);
 };
 
-class Kierownik : public Pracownik {
-protected:
-    string typKier;
-    int iloscPodw, dodFunk /*wyrazony w % */;
-
+class LiczbaSzesnastkowa: public Liczba {
 public:
-    Kierownik():
-        Pracownik(0) {
-        printf("Typ kierownictwa: ");
-        fgetc(stdin);
-        getline(cin, typKier);
-        printf("Ilosc podwladnych: ");
-        cin >> iloscPodw;
-        printf("Dodatek funkcyjny w %%: ");
-        cin >> dodFunk;
-        puts("");
-    }
+    LiczbaSzesnastkowa() {}
+    virtual ~LiczbaSzesnastkowa() {}
 
-    virtual void display() const {
-        Pracownik::display();
-        printf(" + dodatek funkcyjny %d%%, typ kierownictwa: %s, ilosc podwladnych: %d", dodFunk, typKier.c_str(), iloscPodw);
-    }
+    virtual void wyswietl();
+    virtual int pobierz();
+    string naDziesietny();
+    string naDwojkowy();
+    string naOsemkowy();
 
-    void przyjmijPracownika(const Pracownik & prac) {
-        printf("Przyjeto pracownika! Dane pracownika: ");
-        prac.display();
-    }
+    static LiczbaSzesnastkowa dodaj(LiczbaSzesnastkowa& l1, LiczbaSzesnastkowa& l2);
+    static LiczbaSzesnastkowa odejmij(LiczbaSzesnastkowa& l1, LiczbaSzesnastkowa& l2);
+    static LiczbaSzesnastkowa pomnoz(LiczbaSzesnastkowa& l1, LiczbaSzesnastkowa& l2);
+    static LiczbaSzesnastkowa podziel(LiczbaSzesnastkowa& l1, LiczbaSzesnastkowa& l2);
 };
-
-class Resistor {
-    double res;
-
-public:
-    Resistor():
-        res(0) {
-
-    }
-
-    Resistor(double res):
-        res(res) {
-
-    }
-
-    double r() const;
-    void r(double);
-
-    friend Resistor operator+(const Resistor&, const Resistor&);
-    friend Resistor operator*(const Resistor&, const Resistor&);
-    friend ostream& operator<<(ostream&, const Resistor&);
-};
-
-double Resistor::r() const {
-    return res;
-}
-
-void Resistor::r(double r) {
-    res = r;
-}
-
-Resistor operator+(const Resistor& r1, const Resistor& r2) {
-    Resistor ret(r1.r() + r2.r());
-
-    return ret;
-}
-
-Resistor operator*(const Resistor& r1, const Resistor& r2) {
-    Resistor ret((r1.r() + r2.r()) / (r1.r() * r2.r()));
-
-    return ret;
-}
-
-ostream& operator<<(ostream& os, const Resistor& res) {
-    os << res.r();
-    return os;
-}
 
 int main() {
-    //zad 1
-    puts("ZADANIE 1 ZADANIE 1 ZADANIE 1 ZADANIE 1 ZADANIE 1");
-    Pracownik prac;
-    prac.display();
+    cout << "SYSTEM BINARNY" << endl;
+    LiczbaDwojkowa dwojkowa;
+    dwojkowa.pobierz();
+    dwojkowa.wyswietl();
 
-    puts("\n");
-    Kierownik kier;
-    kier.display();
+    cout << "dwojkowa -> dziesietna: " << dwojkowa.naDziesietny() << endl << endl;
+    cout << "dwojkowa -> osemkowa: " << dwojkowa.naOsemkowy() << endl << endl;
+    cout << "dwojkowa -> szesnastkowa: " << dwojkowa.naSzesnastkowy() << endl << endl;
 
-    puts("\n");
-    kier.przyjmijPracownika(prac);
-    puts("");
+    LiczbaDziesietna dziesietna1;
+    dziesietna1.pobierz();
+    dziesietna1.wyswietl();
 
-    //zad 2
-    puts("\nZADANIE 2 ZADANIE 2 ZADANIE 2 ZADANIE 2 ZADANIE 2");
-    Osoba *student = new Student("Zbigniew", "Mach", "20.10.1998", 3, 2, 214523);
-    Osoba *pilkarz = new Pilkarz("Marcin", "Zuch", "19.11.1996", "obronca", "Pisia Zygry");
+    cout << "dziesietna -> dwojkowa: " << dziesietna1.naDwojkowy() << endl;
 
-    student->wypiszInfo();
-    pilkarz->wypiszInfo();
+    cout << endl << "SYSTEM OSEMKOWY" << endl;
 
-    Pilkarz *pilkarz_cast = (Pilkarz*) pilkarz;
-    pilkarz_cast->strzelGola();
+    LiczbaOsemkowa osemkowa;
+    osemkowa.pobierz();
+    osemkowa.wyswietl();
 
-    pilkarz->wypiszInfo();
+    cout << "osemkowa -> dziesietna: " << osemkowa.naDziesietny() << endl << endl;
+    cout << "osemkowa -> dwojkowa: " << osemkowa.naDwojkowy() << endl << endl;
+    cout << "osemkowa -> szesnastkowa: " << osemkowa.naSzesnastkowy() << endl << endl;
 
-    delete student;
-    delete pilkarz;
+    LiczbaDziesietna dziesietna2;
+    dziesietna2.pobierz();
+    dziesietna2.wyswietl();
 
-    //zad 3
-    puts("\n\nZADANIE 3 ZADANIE 3 ZADANIE 3 ZADANIE 3 ZADANIE 3");
-    Resistor r1(5), r2(8);
+    cout << "dziesietna -> osemkowa: " << dziesietna2.naOsemkowy() << endl;
 
-    Resistor r3 = r1 + r2;
+    cout << endl << "SYSTEM SZESNASTKOWY" << endl;
 
-    cout << r3 << endl;
+    LiczbaSzesnastkowa szesnastkowa;
+    szesnastkowa.pobierz();
+    szesnastkowa.wyswietl();
 
-    r3 = r1 * r2;
+    cout << "szesnastkowa -> dziesietna: " << szesnastkowa.naDziesietny() << endl << endl;
+    cout << "szesnastkowa -> dwojkowa: " << szesnastkowa.naDwojkowy() << endl << endl;
+    cout << "szesnastkowa -> osemkowa: " << szesnastkowa.naOsemkowy() << endl << endl;
 
-    cout << r3 << endl;
+    LiczbaDziesietna dziesietna3;
+    dziesietna3.pobierz();
+    dziesietna3.wyswietl();
+
+    cout << "dziesietna -> szesnastkowa: " << dziesietna3.naSzesnastkowy() << endl;
+
+    cout << endl << "TEST OPERACJI ARYTMETYCZNYCH" << endl << endl;
+
+    {
+        LiczbaDziesietna l1, l2;
+        l1.pobierz();
+        l2.pobierz();
+        cout << endl;
+        cout << "SUMA: ";
+        LiczbaDziesietna::dodaj(l1, l2).wyswietl();
+        cout << "ROZNICA: ";
+        LiczbaDziesietna::odejmij(l1, l2).wyswietl();
+        cout << "ILOCZYN: ";
+        LiczbaDziesietna::pomnoz(l1, l2).wyswietl();
+        cout << "ILORAZ: ";
+        LiczbaDziesietna::podziel(l1, l2).wyswietl();
+    }
+
+    cout << endl;
+
+    {
+        LiczbaDwojkowa l1, l2;
+        l1.pobierz();
+        l2.pobierz();
+        cout << endl;
+        cout << "SUMA: ";
+        LiczbaDwojkowa::dodaj(l1, l2).wyswietl();
+        cout << "ROZNICA: ";
+        LiczbaDwojkowa::odejmij(l1, l2).wyswietl();
+        cout << "ILOCZYN: ";
+        LiczbaDwojkowa::pomnoz(l1, l2).wyswietl();
+        cout << "ILORAZ: ";
+        LiczbaDwojkowa::podziel(l1, l2).wyswietl();
+    }
+
+    cout << endl;
+
+    {
+        LiczbaOsemkowa l1, l2;
+        l1.pobierz();
+        l2.pobierz();
+        cout << endl;
+        cout << "SUMA: ";
+        LiczbaOsemkowa::dodaj(l1, l2).wyswietl();
+        cout << "ROZNICA: ";
+        LiczbaOsemkowa::odejmij(l1, l2).wyswietl();
+        cout << "ILOCZYN: ";
+        LiczbaOsemkowa::pomnoz(l1, l2).wyswietl();
+        cout << "ILORAZ: ";
+        LiczbaOsemkowa::podziel(l1, l2).wyswietl();
+    }
+
+    cout << endl;
+
+    {
+        LiczbaSzesnastkowa l1, l2;
+        l1.pobierz();
+        l2.pobierz();
+        cout << endl;
+        cout << "SUMA: ";
+        LiczbaSzesnastkowa::dodaj(l1, l2).wyswietl();
+        cout << "ROZNICA: ";
+        LiczbaSzesnastkowa::odejmij(l1, l2).wyswietl();
+        cout << "ILOCZYN: ";
+        LiczbaSzesnastkowa::pomnoz(l1, l2).wyswietl();
+        cout << "ILORAZ: ";
+        LiczbaSzesnastkowa::podziel(l1, l2).wyswietl();
+    }
 
     return 0;
+}
+
+string LiczbaDwojkowa::naOsemkowy()
+{
+    LiczbaDziesietna ldz;
+    ldz.liczba = naDziesietny();
+    return ldz.naOsemkowy();
+}
+
+string LiczbaDwojkowa::naSzesnastkowy()
+{
+    LiczbaDziesietna ldz;
+    ldz.liczba = naDziesietny();
+    return ldz.naSzesnastkowy();
+}
+
+string LiczbaOsemkowa::naDwojkowy()
+{
+    LiczbaDziesietna ldz;
+    ldz.liczba = naDziesietny();
+    return ldz.naDwojkowy();
+}
+
+string LiczbaOsemkowa::naSzesnastkowy()
+{
+    LiczbaDziesietna ldz;
+    ldz.liczba = naDziesietny();
+    return ldz.naSzesnastkowy();
+}
+
+string LiczbaSzesnastkowa::naDwojkowy()
+{
+    LiczbaDziesietna ldz;
+    ldz.liczba = naDziesietny();
+    return ldz.naDwojkowy();
+}
+
+string LiczbaSzesnastkowa::naOsemkowy()
+{
+    LiczbaDziesietna ldz;
+    ldz.liczba = naDziesietny();
+    return ldz.naOsemkowy();
+}
+
+
+LiczbaOsemkowa LiczbaOsemkowa::dodaj(LiczbaOsemkowa& l1, LiczbaOsemkowa& l2) {
+    LiczbaDziesietna _l1, _l2;
+    _l1.liczba = l1.naDziesietny();
+    _l2.liczba = l2.naDziesietny();
+
+    LiczbaDziesietna _l = LiczbaDziesietna::dodaj(_l1, _l2);
+    LiczbaOsemkowa ret;
+    ret.liczba = _l.naOsemkowy();
+
+    return ret;
+}
+
+LiczbaOsemkowa LiczbaOsemkowa::odejmij(LiczbaOsemkowa& l1, LiczbaOsemkowa& l2) {
+    LiczbaDziesietna _l1, _l2;
+    _l1.liczba = l1.naDziesietny();
+    _l2.liczba = l2.naDziesietny();
+
+    LiczbaDziesietna _l = LiczbaDziesietna::odejmij(_l1, _l2);
+    LiczbaOsemkowa ret;
+    ret.liczba = _l.naOsemkowy();
+
+    return ret;
+}
+
+LiczbaOsemkowa LiczbaOsemkowa::pomnoz(LiczbaOsemkowa& l1, LiczbaOsemkowa& l2) {
+    LiczbaDziesietna _l1, _l2;
+    _l1.liczba = l1.naDziesietny();
+    _l2.liczba = l2.naDziesietny();
+
+    LiczbaDziesietna _l = LiczbaDziesietna::pomnoz(_l1, _l2);
+    LiczbaOsemkowa ret;
+    ret.liczba = _l.naOsemkowy();
+
+    return ret;
+}
+
+LiczbaOsemkowa LiczbaOsemkowa::podziel(LiczbaOsemkowa& l1, LiczbaOsemkowa& l2) {
+    LiczbaDziesietna _l1, _l2;
+    _l1.liczba = l1.naDziesietny();
+    _l2.liczba = l2.naDziesietny();
+
+    LiczbaDziesietna _l = LiczbaDziesietna::podziel(_l1, _l2);
+    LiczbaOsemkowa ret;
+    ret.liczba = _l.naOsemkowy();
+
+    return ret;
+}
+
+LiczbaSzesnastkowa LiczbaSzesnastkowa::dodaj(LiczbaSzesnastkowa& l1, LiczbaSzesnastkowa& l2) {
+    LiczbaDziesietna _l1, _l2;
+    _l1.liczba = l1.naDziesietny();
+    _l2.liczba = l2.naDziesietny();
+
+    LiczbaDziesietna _l = LiczbaDziesietna::dodaj(_l1, _l2);
+    LiczbaSzesnastkowa ret;
+    ret.liczba = _l.naSzesnastkowy();
+
+    return ret;
+}
+
+LiczbaSzesnastkowa LiczbaSzesnastkowa::odejmij(LiczbaSzesnastkowa& l1, LiczbaSzesnastkowa& l2) {
+    LiczbaDziesietna _l1, _l2;
+    _l1.liczba = l1.naDziesietny();
+    _l2.liczba = l2.naDziesietny();
+
+    LiczbaDziesietna _l = LiczbaDziesietna::odejmij(_l1, _l2);
+    LiczbaSzesnastkowa ret;
+    ret.liczba = _l.naSzesnastkowy();
+
+    return ret;
+}
+
+LiczbaSzesnastkowa LiczbaSzesnastkowa::pomnoz(LiczbaSzesnastkowa& l1, LiczbaSzesnastkowa& l2) {
+    LiczbaDziesietna _l1, _l2;
+    _l1.liczba = l1.naDziesietny();
+    _l2.liczba = l2.naDziesietny();
+
+    LiczbaDziesietna _l = LiczbaDziesietna::pomnoz(_l1, _l2);
+    LiczbaSzesnastkowa ret;
+    ret.liczba = _l.naSzesnastkowy();
+
+    return ret;
+}
+
+LiczbaSzesnastkowa LiczbaSzesnastkowa::podziel(LiczbaSzesnastkowa& l1, LiczbaSzesnastkowa& l2) {
+    LiczbaDziesietna _l1, _l2;
+    _l1.liczba = l1.naDziesietny();
+    _l2.liczba = l2.naDziesietny();
+
+    LiczbaDziesietna _l = LiczbaDziesietna::podziel(_l1, _l2);
+    LiczbaSzesnastkowa ret;
+    ret.liczba = _l.naSzesnastkowy();
+
+    return ret;
+}
+
+
+LiczbaDwojkowa LiczbaDwojkowa::dodaj(LiczbaDwojkowa& l1, LiczbaDwojkowa& l2) {
+    LiczbaDziesietna _l1, _l2;
+    _l1.liczba = l1.naDziesietny();
+    _l2.liczba = l2.naDziesietny();
+
+    LiczbaDziesietna _l = LiczbaDziesietna::dodaj(_l1, _l2);
+    LiczbaDwojkowa ret;
+    ret.liczba = _l.naDwojkowy();
+
+    return ret;
+}
+
+LiczbaDwojkowa LiczbaDwojkowa::odejmij(LiczbaDwojkowa& l1, LiczbaDwojkowa& l2) {
+    LiczbaDziesietna _l1, _l2;
+    _l1.liczba = l1.naDziesietny();
+    _l2.liczba = l2.naDziesietny();
+
+    LiczbaDziesietna _l = LiczbaDziesietna::odejmij(_l1, _l2);
+    LiczbaDwojkowa ret;
+    ret.liczba = _l.naDwojkowy();
+
+    return ret;
+}
+
+LiczbaDwojkowa LiczbaDwojkowa::pomnoz(LiczbaDwojkowa& l1, LiczbaDwojkowa& l2) {
+    LiczbaDziesietna _l1, _l2;
+    _l1.liczba = l1.naDziesietny();
+    _l2.liczba = l2.naDziesietny();
+
+    LiczbaDziesietna _l = LiczbaDziesietna::pomnoz(_l1, _l2);
+    LiczbaDwojkowa ret;
+    ret.liczba = _l.naDwojkowy();
+
+    return ret;
+}
+
+LiczbaDwojkowa LiczbaDwojkowa::podziel(LiczbaDwojkowa& l1, LiczbaDwojkowa& l2) {
+    LiczbaDziesietna _l1, _l2;
+    _l1.liczba = l1.naDziesietny();
+    _l2.liczba = l2.naDziesietny();
+
+    LiczbaDziesietna _l = LiczbaDziesietna::podziel(_l1, _l2);
+    LiczbaDwojkowa ret;
+    ret.liczba = _l.naDwojkowy();
+
+    return ret;
+}
+
+
+LiczbaDziesietna LiczbaDziesietna::dodaj(const LiczbaDziesietna& l1, const LiczbaDziesietna& l2) {
+    LiczbaDziesietna ret;
+
+    long long _l1 = stoll(l1.liczba);
+    long long _l2 = stoll(l2.liczba);
+    ret.liczba = std::to_string(_l1 + _l2);
+    return ret;
+}
+
+LiczbaDziesietna LiczbaDziesietna::odejmij(const LiczbaDziesietna& l1, const LiczbaDziesietna& l2) {
+    LiczbaDziesietna ret;
+
+    long long _l1 = stoll(l1.liczba);
+    long long _l2 = stoll(l2.liczba);
+    ret.liczba = std::to_string(_l1 - _l2);
+    return ret;
+}
+
+LiczbaDziesietna LiczbaDziesietna::pomnoz(const LiczbaDziesietna& l1, const LiczbaDziesietna& l2) {
+    LiczbaDziesietna ret;
+
+    long long _l1 = stoll(l1.liczba);
+    long long _l2 = stoll(l2.liczba);
+    ret.liczba = std::to_string(_l1 * _l2);
+    return ret;
+}
+
+LiczbaDziesietna LiczbaDziesietna::podziel(const LiczbaDziesietna& l1, const LiczbaDziesietna& l2) {
+    LiczbaDziesietna ret;
+
+    long long _l1 = stoll(l1.liczba);
+    long long _l2 = stoll(l2.liczba);
+    ret.liczba = std::to_string(_l1 / _l2);
+    return ret;
+}
+
+string LiczbaDziesietna::naSzesnastkowy() {
+    long long _liczba = std::stoll(liczba);
+
+    int _znakSzesnastkowy = _liczba % 16;
+    long long wynikDziel = _liczba / 16;
+
+    string ret = "";
+    ret = znakSzesnastkowy(_znakSzesnastkowy);
+
+    while(wynikDziel > 0) {
+        int reszta = wynikDziel % 16;
+        ret = znakSzesnastkowy(reszta) + ret;
+        wynikDziel = wynikDziel / 16;
+    }
+
+    return ret;
+}
+
+
+void LiczbaSzesnastkowa::wyswietl() {
+    cout << "Liczba szesnastkowa o wartosci: " << liczba << endl;
+}
+
+int LiczbaSzesnastkowa::pobierz() {
+    while(1) {
+        try {
+            cout << "Wprowadz liczbe szesnastkowa: ";
+            cin >> liczba;
+
+            for(char c : liczba) {
+                if(c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7'
+                        || c == '8' || c == '9' || c == 'A' || c == 'a' || c == 'B' || c == 'b' || c == 'C' || c == 'c'
+                        || c == 'D' || c == 'd' || c == 'E' || c == 'e' || c == 'F' || c == 'f') { //OK
+
+                } else { //nie OK
+                    liczba = "0";
+                    throw wrongCharacterEntered;
+                }
+            }
+
+            break;
+        } catch(WrongCharacterEntered& e) {
+            cout << "zle podano liczbe, sprobuj ponownie" << endl;
+        }
+    }
+
+    return 1;
+}
+
+string LiczbaSzesnastkowa::naDziesietny() {
+    long long _liczba = 0;
+
+    for(unsigned int i = 0; i < liczba.length(); i++) {
+        int zeroDoPietnascie = 0;
+
+        switch(liczba[liczba.length() - 1 - i]) {
+        case '0':
+            zeroDoPietnascie = 0;
+            break;
+        case '1':
+            zeroDoPietnascie = 1;
+            break;
+        case '2':
+            zeroDoPietnascie = 2;
+            break;
+        case '3':
+            zeroDoPietnascie = 3;
+            break;
+        case '4':
+            zeroDoPietnascie = 4;
+            break;
+        case '5':
+            zeroDoPietnascie = 5;
+            break;
+        case '6':
+            zeroDoPietnascie = 6;
+            break;
+        case '7':
+            zeroDoPietnascie = 7;
+            break;
+        case '8':
+            zeroDoPietnascie = 8;
+            break;
+        case '9':
+            zeroDoPietnascie = 9;
+            break;
+        case 'A':
+            zeroDoPietnascie = 10;
+            break;
+        case 'a':
+            zeroDoPietnascie = 10;
+            break;
+        case 'B':
+            zeroDoPietnascie = 11;
+            break;
+        case 'b':
+            zeroDoPietnascie = 11;
+            break;
+        case 'C':
+            zeroDoPietnascie = 12;
+            break;
+        case 'c':
+            zeroDoPietnascie = 12;
+            break;
+        case 'D':
+            zeroDoPietnascie = 13;
+            break;
+        case 'd':
+            zeroDoPietnascie = 13;
+            break;
+        case 'E':
+            zeroDoPietnascie = 14;
+            break;
+        case 'e':
+            zeroDoPietnascie = 14;
+            break;
+        case 'F':
+            zeroDoPietnascie = 15;
+            break;
+        case 'f':
+            zeroDoPietnascie = 15;
+            break;
+        }
+
+        _liczba += zeroDoPietnascie * pow(16, i);
+    }
+
+    return std::to_string(_liczba);
+}
+
+
+string LiczbaDziesietna::naOsemkowy() {
+    long long _liczba = std::stoll(liczba);
+
+    string ret = std::to_string(_liczba % 8);
+    long long wynikDziel = _liczba / 8;
+
+    while(wynikDziel > 0) {
+        int reszta = wynikDziel % 8;
+        ret = std::to_string(reszta) + ret;
+        wynikDziel = wynikDziel / 8;
+    }
+
+    return ret;
+}
+
+void LiczbaOsemkowa::wyswietl() {
+    cout << "Liczba osemkowa o wartosci: " << liczba << endl;
+}
+
+int LiczbaOsemkowa::pobierz() {
+    while(1) {
+        try {
+            cout << "Wprowadz liczbe osemkowa: ";
+            cin >> liczba;
+
+            for(char c : liczba) {
+                if(c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7') { //OK
+
+                } else { //nie OK
+                    liczba = "0";
+                    throw wrongCharacterEntered;
+                }
+            }
+
+            break;
+        } catch(WrongCharacterEntered& e) {
+            cout << "zle podano liczbe, sprobuj ponownie" << endl;
+        }
+    }
+
+    return 1;
+}
+
+string LiczbaOsemkowa::naDziesietny() {
+    long long _liczba = 0;
+
+    for(unsigned int i = 0; i < liczba.length(); i++) {
+        int zeroDoOsiem = liczba[liczba.length() - 1 - i] - '0';
+        _liczba += zeroDoOsiem * pow(8, i);
+    }
+
+    return std::to_string(_liczba);
+}
+
+
+void LiczbaDziesietna::wyswietl() {
+    cout << "Liczba dziesietna o wartosci: " << liczba << endl;
+}
+
+int LiczbaDziesietna::pobierz() {
+    while(1) {
+        try {
+            cout << "Wprowadz liczbe dziesietna: ";
+            cin >> liczba;
+
+            for(char c : liczba) {
+                if(c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7' || c == '8' || c == '9') { //OK
+
+                } else { //nie OK
+                    liczba = "0";
+                    throw wrongCharacterEntered;
+                }
+            }
+
+            break;
+        } catch(WrongCharacterEntered& e) {
+            cout << "zle podano liczbe, sprobuj ponownie" << endl;
+        }
+    }
+
+    return 1;
+}
+
+string LiczbaDziesietna::naDwojkowy() {
+    string str = std::bitset<64>(stoll(liczba)).to_string();
+
+    str.erase(0, str.find_first_not_of('0'));
+
+    return str;
+}
+
+
+string LiczbaDwojkowa::naDziesietny() {
+    long long _liczba = 0;
+
+    for(unsigned int i = 0; i < liczba.length(); i++) {
+        int zeroCzyJeden = liczba[liczba.length() - 1 - i] - '0';
+        _liczba += zeroCzyJeden * pow(2, i);
+    }
+
+    return std::to_string(_liczba);
+}
+
+
+void LiczbaDwojkowa::wyswietl() {
+    cout << "Liczba dwojkowa o wartosci: " << liczba << endl;
+}
+
+int LiczbaDwojkowa::pobierz() {
+    while(1) {
+        try {
+            cout << "Wprowadz liczbe binarna: ";
+            cin >> liczba;
+
+            for(char c : liczba) {
+                if(c == '0' || c == '1') { //OK
+
+                } else { //nie OK
+                    liczba = "0";
+                    throw wrongCharacterEntered;
+                }
+            }
+
+            break;
+        } catch(WrongCharacterEntered& e) {
+            cout << "zle podano liczbe, sprobuj ponownie" << endl;
+        }
+    }
+
+    return 1;
+}
+
+char znakSzesnastkowy(int liczba) {
+    switch(liczba) {
+    case 0:
+        return '0';
+    case 1:
+        return '1';
+    case 2:
+        return '2';
+    case 3:
+        return '3';
+    case 4:
+        return '4';
+    case 5:
+        return '5';
+    case 6:
+        return '6';
+    case 7:
+        return '7';
+    case 8:
+        return '8';
+    case 9:
+        return '9';
+    case 10:
+        return 'A';
+    case 11:
+        return 'B';
+    case 12:
+        return 'C';
+    case 13:
+        return 'D';
+    case 14:
+        return 'E';
+    case 15:
+        return 'F';
+    }
+
+    return '0';
 }
