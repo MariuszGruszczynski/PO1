@@ -378,11 +378,8 @@
 	"begin_code.h"
 	"close_code.h"
 
-1642428249 source:d:\codeblocks\projects\test\po1\main.cpp
+1642428318 source:d:\codeblocks\projects\test\po1\main.cpp
 	<iostream>
 	<cstdlib>
 	<cstdio>
-	<fstream>
-	<string>
-	<time.h>
 

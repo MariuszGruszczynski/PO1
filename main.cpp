@@ -1,112 +1,135 @@
 #include <iostream>
 #include <cstdlib>
 #include <cstdio>
-#include <fstream>
-#include <string>
-#include <time.h>
 
 #define M_PI 3.14159265358979323846
 
 using std::cout;
 using std::endl;
-using std::string;
-using std::fstream;
 
-class TestTime {
+class Bryla {
+public:
+    Bryla() {
+
+    }
+    virtual ~Bryla() {
+
+    }
+
+    virtual float Pole() {
+        return 0;
+    }
+    virtual float Objetosc() {
+        return 0;
+    }
+    virtual float Przekatna() {
+        return 0;
+    }
+};
+
+class Ostroslup: public Bryla { //zakladamy ze w podstawie jest wielokat foremny
 private:
-    string path;
-
+    int iloscKatowPodstawy;
+    float dlugoscBokuPodstawy, promienOkreguWpisanego;
+    float wysokoscOstroslupa, wysokoscScianyBocznej;
 public:
-    TestTime(string path):
-        path(path) {
+    Ostroslup(int iloscKatowPodstawy, float dlugoscBokuPodstawy, float promienOkreguWpisanego, float wysokoscOstroslupa, float wysokoscScianyBocznej):
+        Bryla(),
+        iloscKatowPodstawy(iloscKatowPodstawy),
+        dlugoscBokuPodstawy(dlugoscBokuPodstawy),
+        promienOkreguWpisanego(promienOkreguWpisanego),
+        wysokoscOstroslupa(wysokoscOstroslupa),
+        wysokoscScianyBocznej(wysokoscScianyBocznej) {
 
     }
 
-    virtual ~TestTime() {
-
-    }
-
-    int odczyt();
-    virtual int odczytVirtual();
+    virtual float Objetosc();
+    virtual float Pole();
 };
 
-class TestTime2: public TestTime {
+float Ostroslup::Objetosc() {
+    float Pp = iloscKatowPodstawy * dlugoscBokuPodstawy * promienOkreguWpisanego / 2.0; // pole wielokata foremnego = nar/2
+
+    return 1.0 / 3.0 * Pp * wysokoscOstroslupa;
+}
+
+float Ostroslup::Pole() {
+    float Pp = iloscKatowPodstawy * dlugoscBokuPodstawy * promienOkreguWpisanego / 2.0; // pole wielokata foremnego = nar/2
+    float poleScianyBocznej = dlugoscBokuPodstawy * wysokoscScianyBocznej / 2.0;
+    float Pb = iloscKatowPodstawy * poleScianyBocznej;
+
+    return Pp + Pb;
+}
+
+
+class Prostopadloscian: public Bryla {
+private:
+    float width, height, depth;
+
 public:
-    TestTime2(string path):
-        TestTime(path) {
+    Prostopadloscian(float width, float height, float depth):
+        Bryla(),
+        width(width),
+        height(height),
+        depth(depth) {}
 
-    }
-
-    virtual ~TestTime2() {
-
-    }
+    virtual float Objetosc();
+    virtual float Pole();
 };
 
-
-int TestTime::odczyt() {
-    fstream plik;
-    plik.open(path.c_str(), std::ios::in);
-
-    if(!plik.is_open())
-        return 0;
-
-    string napis;
-
-    while(!plik.eof()) {
-        getline( plik, napis );
-        cout << napis << endl;
-    }
-
-    plik.close();
-
-    return 1;
+float Prostopadloscian::Objetosc() {
+    return width * height * depth;
 }
 
-int TestTime::odczytVirtual() {
-    fstream plik;
-    plik.open(path.c_str(), std::ios::in);
-
-    if(!plik.is_open())
-        return 0;
-
-    string napis;
-
-    while(!plik.eof()) {
-        getline( plik, napis );
-        cout << napis << endl;
-    }
-
-    plik.close();
-
-    return 1;
+float Prostopadloscian::Pole() {
+    return 2 * (width * height + width * depth + height * depth);
 }
 
+
+class Kula: public Bryla {
+private:
+    float r; //promien w cm
+
+public:
+    Kula(float r):
+        Bryla(),
+        r(r) {
+
+    }
+
+    virtual ~Kula() {
+
+    }
+
+    virtual float Pole();
+    virtual float Objetosc();
+};
+
+float Kula::Pole() {
+    return 4.0 * M_PI * r * r;
+}
+
+float Kula::Objetosc() {
+    return 4.0 / 3.0 * M_PI * r * r * r;
+}
 
 int main() {
-    TestTime2 t("input.txt");
+    Bryla *kula = new Kula(1);
 
-    clock_t start, end;
-    clock_t startVirtual, endVirtual;
-    double cpu_time_used, cpu_time_used_virtual;
+    cout << "Kula: " << kula->Pole() << " cm^2 " << kula->Objetosc() << " cm^3" << endl;
 
-    start = clock();
-    t.odczyt();
-    end = clock();
+    Bryla *prosto = new Prostopadloscian(5, 3, 4);
 
-    startVirtual = clock();
-    t.odczytVirtual();
-    endVirtual = clock();
+    cout << "Prostopadloscian: " << prosto->Pole() << " cm^2 " << prosto->Objetosc() << " cm^3" << endl;
 
-    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-    cout << endl << "czas potrzebny dla funkcji niewirtualnej: " << cpu_time_used << endl;
+    Bryla *ostro = new Ostroslup(5, 3.5, 8, 4, 3.5);
 
-    cpu_time_used_virtual = ((double) (endVirtual - startVirtual)) / CLOCKS_PER_SEC;
-    cout << "czas potrzebny dla funkcji wirtualnej: " << cpu_time_used_virtual << endl << endl;
+    cout << "Ostroslup: " << ostro->Pole() << " cm^2 " << ostro->Objetosc() << " cm^3" << endl;
 
-    if(cpu_time_used < cpu_time_used_virtual)
-        puts("wiecej czasu zajela funkcja wirtualna");
-    else
-        puts("wiecej czasu zajela funkcja niewirtualna");
+
+    delete ostro;
+    delete kula;
+    delete prosto;
 
     return 0;
 }
