@@ -17,6 +17,7 @@ public:
         width(_width),
         height(_height) {
         data.reserve(width * height);
+        cout << "AAA GIT TEST AAA" << endl;
 
         for(int i = 0; i < width * height; i++)
             data[i] = i + 1 + i / 10.0;
