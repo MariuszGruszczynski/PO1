@@ -1,50 +1,61 @@
 #include <iostream>
-#include <cstdio>
 #include <cstdlib>
-#include <string>
-#include <cmath>
+#include <cstdio>
 
 using std::cout;
-using std::cin;
 using std::endl;
-using std::string;
-using std::exception;
+using std::ostream;
 
-//u¿ycie w³asnej klasy wyj¹tku
+class Kondensator {
+private:
+    double poj;
 
-class MojWyjatek: public exception {
 public:
-    virtual const char* what() const throw() {
-        return "Moj wyjatek";
+    Kondensator() : poj(0) {
     }
+
+    Kondensator(double poj) : poj(poj) {
+    }
+
+    double pojemnosc() {
+        return poj;
+    }
+
+    void pojemnosc(double p) {
+        poj = p;
+    }
+
+    friend Kondensator operator+(const Kondensator &, const Kondensator &);
+    friend Kondensator operator*(const Kondensator &, const Kondensator &);
+    friend ostream &operator<<(ostream &, const Kondensator &);
 };
 
-int main () {
-    MojWyjatek myex;
+ostream &operator<<(ostream &os, const Kondensator &k) {
+    os << "Kondensator o pojemnosci: " << k.poj << endl;
+    return os;
+}
 
-    try {
-        int x = 0, z = 0;
+Kondensator operator+(const Kondensator &k1, const Kondensator &k2) { // + czyli szeregowy czyli dodawanie odwrotnosci
+    double reverseC = (1.0 / k1.poj) + (1.0 / k2.poj);
+    double C = 1.0 / reverseC;
 
-        cout << "podaj x, z: ";
-        cin >> x >> z;
+    Kondensator k(C);
 
-        if(!cin.good())
-            throw myex;
+    return k;
+}
 
-        if(x * x - z * z < 0)
-            throw myex;
+Kondensator operator*(const Kondensator &k1, const Kondensator &k2) { // * czyli rownolegly czyli zwykle dodawanie
+    Kondensator k(k1.poj + k2.poj);
+    return k;
+}
 
-        if(x - z <= 0)
-            throw myex;
+int main() {
+    Kondensator k1(4), k2(5), k3(6), k4(7);
+    Kondensator kMnozenie = k1 * k2 * k3 * k4;
+    Kondensator kDodawanie = k1 + k2 + k3 + k4;
 
-        float y = sqrt(x * x - z * z) / sqrt(x - z);
-
-        printf("wynik: %f", y);
-    }
-
-    catch (const exception& e) {
-        cout << e.what() << endl;
-    }
+    cout << kMnozenie;  //mnozenie, laczenie rownolegle
+    cout << kDodawanie; //dodawanie, laczenie szeregowe
 
     return 0;
 }
