@@ -18,6 +18,8 @@ public:
         height(_height) {
         data.reserve(width * height);
         cout << "AAA GIT TEST AAA" << endl;
+        cout << "AAA GIT TEST AAA2" << endl;
+        cout << "AAA GIT TEST AAA3" << endl;
 
         for(int i = 0; i < width * height; i++)
             data[i] = i + 1 + i / 10.0;
